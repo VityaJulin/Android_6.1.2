@@ -75,6 +75,7 @@ public class ListViewActivity extends AppCompatActivity {
     @NonNull
     private List<Map<String, String>> prepareContent() {
         String[] titles = savedText.getString(NOTE_TEXT, "").split("\n\n");
+        simpleAdapterContent.clear();
         for (String title : titles) {
             Map<String, String> map = new HashMap<>();
             map.put(KEY_TITLE, title);

@@ -40,8 +40,9 @@ public class ListViewActivity extends AppCompatActivity {
         String str = getString(R.string.large_text);
         savedText = getSharedPreferences("SavedText", MODE_PRIVATE);
         SharedPreferences.Editor editor = savedText.edit();
-        editor.putString(NOTE_TEXT, str);
-        editor.apply();
+        savedText.edit()
+                .putString(NOTE_TEXT, str)
+                .apply();
 
         prepareContent();
 
@@ -73,7 +74,7 @@ public class ListViewActivity extends AppCompatActivity {
     }
 
     @NonNull
-    private List<Map<String, String>> prepareContent() {
+    private void prepareContent() {
         String[] titles = savedText.getString(NOTE_TEXT, "").split("\n\n");
         simpleAdapterContent.clear();
         for (String title : titles) {
@@ -82,6 +83,5 @@ public class ListViewActivity extends AppCompatActivity {
             map.put(KEY_COUNT, String.valueOf(title.length()));
             simpleAdapterContent.add(map);
         }
-        return simpleAdapterContent;
     }
 }

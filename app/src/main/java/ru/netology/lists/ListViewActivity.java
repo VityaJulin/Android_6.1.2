@@ -23,12 +23,11 @@ import java.util.Map;
 public class ListViewActivity extends AppCompatActivity {
     private static final String KEY_TITLE = "key_title";
     private static final String KEY_COUNT = "key_count";
-    private SharedPreferences savedText;
-    private static String NOTE_TEXT = "saved_text";
+    private static final String NOTE_TEXT = "note_text";
+    private static final String KEY_DELETED_POSITION = "key_deleted_position";
     private static List<Map<String, String>> simpleAdapterContent = new ArrayList<>();
     private static ArrayList<Integer> deletedItemsPosition = new ArrayList<>();
-    private final String KEY_DELETED_POSITION = "KEY_DELETED_POSITION";
-    private Bundle bundle = new Bundle();
+    private SharedPreferences savedText;
 
 
     @Override
@@ -44,7 +43,6 @@ public class ListViewActivity extends AppCompatActivity {
 
         String str = getString(R.string.large_text);
         savedText = getSharedPreferences("SavedText", MODE_PRIVATE);
-        SharedPreferences.Editor editor = savedText.edit();
         savedText.edit()
                 .putString(NOTE_TEXT, str)
                 .apply();
@@ -59,7 +57,7 @@ public class ListViewActivity extends AppCompatActivity {
                 simpleAdapterContent.remove(position);
                 deletedItemsPosition.add(position);
                 listContentAdapter.notifyDataSetChanged();
-                Toast.makeText(ListViewActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ListViewActivity.this, R.string.toast_deleted, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -69,7 +67,7 @@ public class ListViewActivity extends AppCompatActivity {
                 prepareContent();
                 listContentAdapter.notifyDataSetChanged();
                 swipeRefresh.setRefreshing(false);
-                Toast.makeText(ListViewActivity.this, "Refreshed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ListViewActivity.this, R.string.toast_refreshed, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -94,13 +92,22 @@ public class ListViewActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        bundle.putIntegerArrayList(KEY_DELETED_POSITION, deletedItemsPosition);
+        outState.putIntegerArrayList(KEY_DELETED_POSITION, deletedItemsPosition);
     }
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        bundle.getIntegerArrayList(String.valueOf(deletedItemsPosition));
+        if (savedInstanceState == null) {
+            return;
+        }
+
+        deletedItemsPosition = savedInstanceState.getIntegerArrayList(KEY_DELETED_POSITION);
+        if (deletedItemsPosition == null) {
+            deletedItemsPosition = new ArrayList<>();
+            return;
+        }
+
         for (int position : deletedItemsPosition) {
             simpleAdapterContent.remove(position);
         }

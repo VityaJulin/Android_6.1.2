@@ -10,6 +10,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -25,6 +26,10 @@ public class ListViewActivity extends AppCompatActivity {
     private SharedPreferences savedText;
     private static String NOTE_TEXT = "saved_text";
     private static List<Map<String, String>> simpleAdapterContent = new ArrayList<>();
+    private static ArrayList<Integer> deletedItemsPosition = new ArrayList<>();
+    private final String KEY_DELETED_POSITION = "KEY_DELETED_POSITION";
+    private Bundle bundle = new Bundle();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,7 @@ public class ListViewActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 simpleAdapterContent.remove(position);
+                deletedItemsPosition.add(position);
                 listContentAdapter.notifyDataSetChanged();
                 Toast.makeText(ListViewActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
             }
@@ -82,6 +88,21 @@ public class ListViewActivity extends AppCompatActivity {
             map.put(KEY_TITLE, title);
             map.put(KEY_COUNT, String.valueOf(title.length()));
             simpleAdapterContent.add(map);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        bundle.putIntegerArrayList(KEY_DELETED_POSITION, deletedItemsPosition);
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        bundle.getIntegerArrayList(String.valueOf(deletedItemsPosition));
+        for (int position : deletedItemsPosition) {
+            simpleAdapterContent.remove(position);
         }
     }
 }
